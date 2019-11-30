@@ -1,0 +1,12 @@
+name: wordpress
+summary: WordPress
+maintainer: Operator Framework Developers https://github.com/canonical/operator/graphs/contributors
+description: |
+    WordPress CMS charm.
+tags:
+    - blog
+series:
+    - kubernetes
+requires:
+    db:
+        interface: mysql
