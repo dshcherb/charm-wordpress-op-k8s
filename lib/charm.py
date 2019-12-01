@@ -44,24 +44,24 @@ class Charm(CharmBase):
         log('Ran on_install')
 
     def on_start(self, event):
-        log('Ran start')
+        log('Ran on_start')
+        new_pod_spec = self.make_pod_spec()
+        self.state.spec = new_pod_spec
+        self._apply_spec(new_pod_spec)
 
     def on_stop(self, event):
-        log('Ran stop')
+        log('Ran on_stop')
 
     def on_config_changed(self, event):
         log('Ran on_config_changed')
-
-        try:
-            applied_spec = self.state.spec
-        except AttributeError:
-            applied_spec = None
-
         new_spec = self.make_pod_spec()
 
-        if applied_spec != new_spec:
-            self.framework.model.pod.set_spec(new_spec)
-            self.state.spec = new_spec
+        if self.state.spec != new_spec:
+            self._apply_spec(new_spec)
+
+    def _apply_spec(self, spec):
+        self.framework.model.pod.set_spec(spec)
+        self.state.spec = spec
 
     def on_wordpress_ready(self, event):
         pass
