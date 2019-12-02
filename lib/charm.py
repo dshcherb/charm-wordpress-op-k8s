@@ -32,7 +32,7 @@ class Charm(CharmBase):
     def __init__(self, *args):
         super().__init__(*args)
 
-        self.framework.observe(self.on.install, self)
+        self.framework.observe(self.on.install, self)  # TODO: this will only be relevant as soon as LP: #1854635 will be fixed.
         self.framework.observe(self.on.start, self)
         self.framework.observe(self.on.stop, self)
         self.framework.observe(self.on.config_changed, self)
@@ -41,7 +41,7 @@ class Charm(CharmBase):
 
         self.framework.observe(self.on.wordpress_ready, self)
 
-    def on_install(self, event):
+    def on_install(self, event):  # TODO: this will only be relevant as soon as LP: #1854635 will be fixed.
         # Initialize Charm state here
         log('Ran on_install')
 
