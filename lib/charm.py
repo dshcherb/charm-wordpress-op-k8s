@@ -1,11 +1,13 @@
 #!/usr/bin/env python3
 
-from op.charm import CharmBase, CharmEvents, RelationUnitEvent
+from op.charm import CharmBase, CharmEvents
 from op.framework import (
     Event,
     EventBase,
     StoredState,
 )
+
+from op.model import ActiveStatus, BlockedStatus
 
 from op.main import main
 
@@ -59,6 +61,8 @@ class Charm(CharmBase):
         if self.state.spec != new_spec:
             self._apply_spec(new_spec)
 
+        self.framework.model.unit.status = ActiveStatus()
+
     def _apply_spec(self, spec):
         self.framework.model.pod.set_spec(spec)
         self.state.spec = spec
@@ -71,11 +75,12 @@ class Charm(CharmBase):
             event.defer()
             return
 
-        if isinstance(event, RelationUnitEvent):
-            # event.relation.data[event.unit].get('hostname')
-            # event.relation.data[event.unit].get('port')
-            # event.relation.data[event.unit].get('password')
-            pass
+        # Make sure that the following data is present and skip the event if not.
+        # It makes no sense to defer it as you have enough other information to handle it
+        # and if there will be more info available from a remote app, there will be another event.
+        # event.relation.data[event.app].get('hostname')
+        # event.relation.data[event.app].get('port')
+        # event.relation.data[event.app].get('password')
 
     def make_pod_spec(self):
         config = self.framework.model.config
@@ -110,7 +115,7 @@ class Charm(CharmBase):
         else:
             container_config = yaml.safe_load(self.framework.model.config["container_config"])
             if not isinstance(container_config, dict):
-                status_set('blocked', "container_config is not a YAML mapping")
+                self.framework.model.unit.status = BlockedStatus("container_config is not a YAML mapping")
                 return None
         # container_config["WORDPRESS_DB_HOST"] = config["db_host"]
         # container_config["WORDPRESS_DB_USER"] = config["db_user"]
@@ -127,29 +132,12 @@ class Charm(CharmBase):
         else:
             container_secrets = yaml.safe_load(config["container_secrets"])
             if not isinstance(container_secrets, dict):
-                status_set('blocked', "container_secrets is not a YAML mapping")
+                self.framework.model.unit.status = BlockedStatus("container_secrets is not a YAML mapping")
                 return None
         container_config.update(container_secrets)
         # container_config["WORDPRESS_DB_PASSWORD"] = config["db_password"]
         return container_config
 
-def status_set(workload_state, message):
-    """Set the workload state with a message
-
-    Use status-set to set the workload state with a message which is visible
-    to the user via juju status.
-
-    workload_state -- valid juju workload state.
-    message        -- status update message
-    """
-    valid_states = ['maintenance', 'blocked', 'waiting', 'active']
-
-    if workload_state not in valid_states:
-        raise ValueError(
-            '{!r} is not a valid workload state'.format(workload_state)
-        )
-
-    subprocess.check_call(['status-set', workload_state, message])
 
 def log(message, level=None):
     """Write a message to the juju log"""
