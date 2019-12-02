@@ -18,4 +18,5 @@ juju deploy ./charm-wordpress-op-k8s
 
 # Known Issues
 
-* K8s charms do not get an `install` event fired (`start` event is fired instead), thus the mechanism of auto-creating symlinks in the framework does not work. See https://bugs.launchpad.net/juju/+bug/1854635. This should be fixed after https://github.com/canonical/operator/pull/63 is merged.
+* K8s charms do not get an `install` event fired (`start` event is fired instead), thus the mechanism of auto-creating symlinks in the framework does not work. See https://bugs.launchpad.net/juju/+bug/1854635. This should be fixed after https://github.com/canonical/operator/pull/63 is merged;
+* The 'db' relation is not implemented yet.
