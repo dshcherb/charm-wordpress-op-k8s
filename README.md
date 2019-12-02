@@ -13,6 +13,7 @@ sudo snap install juju --classic
 sudo snap install microk8s --classic
 microk8s.enable dns dashboard registry storage
 juju bootstrap microk8s
+juju create-storage-pool operator-storage kubernetes storage-class=microk8s-hostpath
 juju deploy ./charm-wordpress-op-k8s
 ```
 
