@@ -1,15 +1,15 @@
 #!/usr/bin/env python3
 
-from op.charm import CharmBase, CharmEvents
-from op.framework import (
-    Event,
+from ops.charm import CharmBase, CharmEvents
+from ops.framework import (
+    EventSource,
     EventBase,
     StoredState,
 )
 
-from op.model import ActiveStatus, BlockedStatus
+from ops.model import ActiveStatus, BlockedStatus
 
-from op.main import main
+from ops.main import main
 
 import subprocess
 import yaml
@@ -20,7 +20,7 @@ class WordPressReadyEvent(EventBase):
 
 
 class WordPressCharmEvents(CharmEvents):
-    wordpress_ready = Event(WordPressReadyEvent)
+    wordpress_ready = EventSource(WordPressReadyEvent)
 
 
 class Charm(CharmBase):
@@ -40,6 +40,8 @@ class Charm(CharmBase):
         self.framework.observe(self.on.db_relation_changed, self)
 
         self.framework.observe(self.on.wordpress_ready, self)
+
+        self.framework.observe(self.on.test_action, self)
 
     def on_install(self, event):  # TODO: this will only be relevant as soon as LP: #1854635 will be fixed.
         # Initialize Charm state here
@@ -70,6 +72,10 @@ class Charm(CharmBase):
 
     def on_wordpress_ready(self, event):
         pass
+
+    def on_test_action(self, event):
+        event.log(event.params)
+        event.set_results({'ran': 'yes'})
 
     def on_db_relation_changed(self, event):
         if not self.state.ready:

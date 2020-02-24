@@ -1,0 +1,6 @@
+test:
+  description: Test action.
+  params:
+    input:
+      type: string
+      description: Input parameter.

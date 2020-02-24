@@ -10,3 +10,4 @@ series:
 requires:
     db:
         interface: mysql
+min-juju-version: 2.7.0
